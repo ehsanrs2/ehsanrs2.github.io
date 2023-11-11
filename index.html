@@ -1,74 +1,91 @@
-<html>
-<head>
-<title>Coming Soon!</title>
-<style>
-body {
-  background-image: url('construction.jpg');
-  background-size: cover; 
-  background-repeat: no-repeat;
-  font-family: Arial, sans-serif;
-  color: #333;
-  text-align: center;
-}
-
-h1 {
-  font-size: 48px;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
-p {
-  font-size: 24px;
-  margin: 30px 0;
-}
-
-#countdown {
-  font-size: 72px;
-  margin: 50px 0;
-}
-
-</style>
-</head>
-<body>
-
-<h1>Site Under Construction</h1>
-
-<p id="message">We're working hard to deliver an awesome new website!</p>
-
-<div id="countdown"></div>
-
-<p>Please check back soon...</p>
+<!-- Existing HTML -->
 
 <script>
-// Countdown timer
-const countdown = document.getElementById("countdown");
-const launchDate = new Date("March 1, 2023 00:00:00").getTime();
+// Flappy Bird Game
+const block = document.getElementById("block");
+const hole = document.getElementById("hole");
+const character = document.getElementById("character");
+let jumping = 0;
+let counter = 0;
+
+hole.addEventListener('animationiteration', () => {
+  const random = -((Math.random()*300)+150);
+  hole.style.top = random + "px";
+  counter++;
+});
 
 setInterval(function() {
-
-  const now = new Date().getTime();
-  const diff = launchDate - now;
-
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-  countdown.innerHTML = `
-  ${days} days 
-  ${hours < 10 ? "0" : ""}${hours} hours
-  ${minutes < 10 ? "0" : ""}${minutes} minutes 
-  ${seconds < 10 ? "0" : ""}${seconds} seconds
-  `;
-  
-  if (diff < 0) {
-    clearInterval(timer);
-    countdown.innerHTML = "Site Launched!";
-    message.innerHTML = "Our new website is now live, thanks for your patience!";
+  const characterTop = parseInt(window.getComputedStyle(character).getPropertyValue("top"));
+  if(jumping==0){
+    character.style.top = (characterTop+3)+"px";
   }
-}, 1000);
+  const blockLeft = parseInt(window.getComputedStyle(block).getPropertyValue("left"));
+  if(blockLeft<20 && blockLeft>-20 && characterTop>=130){
+    alert("Game Over. Score: "+ Math.floor(counter/100));
+    counter=0;
+    hole.style.animation = "none"; // stop animation
+  }
+},10);
+
+function jump(){
+  jumping = 1;
+  let jumpCount = 0;
+  const jumpInterval = setInterval(function(){
+    const characterTop = parseInt(window.getComputedStyle(character).getPropertyValue("top"));
+    if((characterTop>6)&&(jumpCount<15)){
+      character.style.top = (characterTop-5)+"px";
+    }
+    if(jumpCount>20){
+      clearInterval(jumpInterval);
+      jumping=0;
+      jumpCount=0;
+    }
+    jumpCount++;
+  },10);
+}
 </script>
 
-</body>
-</html>
+<div id="character"></div>
+<div id="block"></div>
+<div id="hole"></div>
+
+<button onClick="jump()">Jump</button>
+
+<!-- Styles -->
+#character {
+  width: 20px;
+  height: 50px;
+  background-color: #333;
+  position: relative;
+  top: 150px;
+}
+
+#block {
+  width: 20px;
+  height: 20px; 
+  background-color: #333;
+  position: relative;
+  top: 100px;
+  left: 500px;
+  animation: block 2s infinite linear;
+}
+
+@keyframes block {
+  0% {left: 500px;}
+  100% {left: -20px;}
+} 
+
+#hole {
+  width: 50px;
+  height: 150px;
+  background-color: #fff;
+  position: relative;
+  top: -150px;
+  left: 500px;
+  animation: hole 2s infinite linear;  
+}
+
+@keyframes hole {
+  0% {left: 500px;}
+  100% {left: -50px;}
+}
